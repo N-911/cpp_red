@@ -1,0 +1,32 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/snikolayen/cpp_red/w1/logger.cpp
+test_runner.h
+/Users/snikolayen/cpp_red/w1/test_runner.h
+sstream
+-
+string
+-
+
+/Users/snikolayen/cpp_red/w1/test_runner.h
+sstream
+-
+stdexcept
+-
+iostream
+-
+map
+-
+set
+-
+string
+-
+vector
+-
+
