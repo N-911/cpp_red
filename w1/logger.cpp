@@ -28,13 +28,15 @@ private:
   int line;
 };
 
-
 void Logger :: Log(const string &message) {
-
     if (log_line && log_file) {
-        os << file << ": ";
-        os << line;
+        os << file << ":" << line << " ";
+    } else if (!log_file && log_line) {
+        os << "Line " << line << " ";
+    } else if (log_file && !log_line) {
+        os << file << " ";
     }
+    os << message << '\n';
 }
 
 #define LOG(logger, message) { \
@@ -42,7 +44,6 @@ void Logger :: Log(const string &message) {
     logger.SetLine(__LINE__);  \
     logger.Log(message);       \
 }
-
 
 void TestLog() {
 /* Для написания юнит-тестов в этой задаче нам нужно фиксировать конкретные
