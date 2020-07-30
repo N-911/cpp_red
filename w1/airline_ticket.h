@@ -26,7 +26,7 @@ struct Time {
   int hours, minutes;
 
 public:
-    Time(int hours_, int minutes_) : hours(hours_), minutes(minutes_) {}
+//    Time(int hours_, int minutes_) : hours(hours_), minutes(minutes_) {}
 
 //    int GetHours() const {
 //        return hours;
