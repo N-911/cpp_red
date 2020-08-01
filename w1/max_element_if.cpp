@@ -12,8 +12,6 @@ using namespace std;
 template<typename ForwardIterator, typename UnaryPredicate>
 ForwardIterator max_element_if(ForwardIterator first, ForwardIterator last, UnaryPredicate pred) {
 
-    sort()
-  // Реализуйте эту функцию
 }
 
 void TestUniqueMax() {

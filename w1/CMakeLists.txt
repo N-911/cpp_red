@@ -9,7 +9,13 @@ add_executable(w1
 #        logger.cpp
         #        max_element_if.cpp
         #        sort_by.cpp
-        #        test_runner.h
-        airline_ticket.h
-        update_field.cpp
+                test_runner.h
+#        airline_ticket.h
+#        update_field.cpp
+#        print_values.cpp
+#        uniq_id.cpp
+#        table.cpp
+#        deque.cpp
+#        ___templates.cpp
+        paginator.cpp
         )
