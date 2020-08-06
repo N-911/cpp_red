@@ -4,77 +4,58 @@
 #include <iomanip>
 #include <deque>
 
-
 using namespace std;
 
-bool Cmp_time(const int& time_1, const int& time_2) {
-    return time_1 < time_2;
 
-}
 struct s_hotel {
-
 public :
-
-    s_hotel(int _time, string _hotel_name, int _client_id, size_t _room_count) : time(_time),
-                   hotel_name(_hotel_name), client_id(_client_id), room_count(_room_count) {}
+    s_hotel(int _time, int _client_id, size_t _room_count) : time(_time),
+                        client_id(_client_id), room_count(_room_count) {}
     s_hotel() {}
     int time;
-    string hotel_name;
+//    string hotel_name;
     int client_id;
     size_t room_count;
 };
 
-
-
-
 class Hotel {
 public:
-
     Hotel() = default;
 
     void Book(int time, string hotel_name, int client_id, size_t room_count) {
-        all_hotels[hotel_name].push_back(s_hotel({time, hotel_name, client_id, room_count}));
-        hotel_rooms[hotel_name] += room_count;
+        all_hotels[hotel_name].push_back(s_hotel({time, client_id, room_count}));
+        rooms_count[hotel_name] += room_count;
         current_time = time;
-        Update_hotels(hotel_name);
     };
 
     int Get_current_time() const {
         return current_time;
     }
 
-    int Clients(string hotel_name) {
-
+    int Clients(const string& hotel_name) {
         Update_hotels(hotel_name);
 
-
-//        auto it_clients =
-//        auto res = *it;
-//        cout << res.time << ' ' << res.hotel_name << endl;
-//        return all_hotels[hotel_name].end() - it;
     return 0;
-
+    }
+    int Rooms(const string& hotel_name) {
+        Update_hotels(hotel_name);
+        return rooms_count[hotel_name];
     }
 
-    int Rooms(string hotel_name) {
-
-        return hotel_rooms[hotel_name];
-    }
 private:
-//    vector<s_hotel> hotels;
-    int current_time;
-    map<string, vector<s_hotel>> all_hotels;
-    map<string, int> hotel_rooms;
-
-//    map<string, int> all_room;
+    int64_t current_time = 0;
+    map<string, deque<s_hotel>> all_hotels;
+    map<string, int> rooms_count;  // key->hotel_name   value->struct{time, hotel_name, cl_id, room_c}
 
     void Update_hotels(string hotel_name) {
     int cur_t = Get_current_time();
-    auto it = lower_bound(all_hotels[hotel_name].begin(), all_hotels[hotel_name].end(), s_hotel(),
-                          [cur_t](const s_hotel& lhs, const s_hotel& rhs){
-                              return lhs.time < (cur_t - 86400); } );
-    vector<s_hotel> temp = {it, all_hotels[hotel_name].end()};
-    all_hotels[hotel_name] = temp;
+
+    while (!all_hotels[hotel_name].empty() && all_hotels[hotel_name].front().time <= current_time - 86400) {
+        int temp = all_hotels[hotel_name].front().room_count;
+        all_hotels[hotel_name].pop_front();
+        rooms_count[hotel_name] -=temp;
+
+        }
     }
 };
 
@@ -93,7 +74,7 @@ int main() {
         cin >> query_type;
 
         if (query_type == "BOOK") {
-            int time;
+            int64_t time;
             string hotel_name;
             int user_id;
             int room_count;
@@ -115,3 +96,21 @@ int main() {
 
     return 0;
 }
+
+
+//        auto it_clients =
+//        auto res = *it;
+//        cout << res.time << ' ' << res.hotel_name << endl;
+//        return all_hotels[hotel_name].end() - it;
+
+//    auto it = lower_bound(all_hotels[hotel_name].begin(), all_hotels[hotel_name].end(), s_hotel(),
+//                          [cur_t](const s_hotel& lhs, const s_hotel& rhs){
+//                              return lhs.time < (cur_t - 86400); } );
+//    vector<s_hotel> temp = {it, all_hotels[hotel_name].end()};
+
+/*
+ * bool Cmp_time(const int& time_1, const int& time_2) {
+    return time_1 < time_2;
+
+}
+ */
