@@ -7,86 +7,69 @@ using namespace std;
 
 class ReadingManager {
 public:
-  ReadingManager()
-      : user_page_counts_(MAX_USER_COUNT_ + 1, 0),
-//        sorted_users_(),
-//        user_positions_(MAX_USER_COUNT_ + 1, -1),
-        pages_stat(1001, 0),
-        count_users(0) {}    // init how many user read specific page
+    ReadingManager()
+            : user_page_counts_(MAX_USER_COUNT_ + 1, 0),
+              sorted_users_(),
+              user_positions_(MAX_USER_COUNT_ + 1, -1) {}
 
-  void Read(int user_id, int page_count) {
-    if (user_page_counts_[user_id] == 0) {
-      AddUser(user_id, page_count);
-    }
-    user_page_counts_[user_id] = page_count;
-
-      for (int i = 0; i < page_count; ++i) {
-          ++pages_stat[i];
-      }
-
-//    int& position = user_positions_[user_id];
-//    while (position > 0 && page_count > user_page_counts_[sorted_users_[position - 1]]) {
-//      SwapUsers(position, position - 1);
-//    }
-  }
-
-  double Cheer(int user_id) const {
-    if (user_page_counts_[user_id] == 0) {
-      return 0;                 // Если для данного пользователя пока не было ни одного события READ, доля считается равной 0,
-    }
-    const int user_count = GetUserCount();
-    if (user_count == 1) {
-      return 1;
-    }
-    const int page_count = user_page_counts_[user_id];  // количество прочитаних страниц current user
-
-    const int n_us_who_read_as_current = pages_stat[page_count];
-
-    int rs = 0;
-
-    for (int a = 0; a < page_count; ++a) {
-        if (pages_stat[a] != 0)
-            ++rs;
+    void Read(int user_id, int page_count) {
+        if (user_page_counts_[user_id] == 0) {
+            AddUser(user_id);
+        }
+        user_page_counts_[user_id] = page_count;
+        int& position = user_positions_[user_id];
+        while (position > 0 && page_count > user_page_counts_[sorted_users_[position - 1]]) {
+            SwapUsers(position, position - 1);
+        }
     }
 
-//    int position = user_positions_[user_id];
-//    while (position < user_count &&
-//      user_page_counts_[sorted_users_[position]] == page_count) {
-//      ++position;
-//    }
-    if (rs == 0) {
-        return 0;
+    double Cheer(int user_id) const {
+        if (user_page_counts_[user_id] == 0) {
+            return 0;
+        }
+        const int user_count = GetUserCount();
+        if (user_count == 1) {
+            return 1;
+        }
+        const int page_count = user_page_counts_[user_id];
+        int position = user_positions_[user_id];
+        while (position < user_count &&
+               user_page_counts_[sorted_users_[position]] == page_count) {
+            ++position;
+        }
+        if (position == user_count) {
+            return 0;
+        }
+        // По умолчанию деление целочисленное, поэтому
+        // нужно привести числитель к типу double.
+        // Простой способ сделать это — умножить его на 1.0.
+        return (user_count - position) * 1.0 / (user_count - 1);
     }
-    // По умолчанию деление целочисленное, поэтому
-    // нужно привести числитель к типу double.
-    // Простой способ сделать это — умножить его на 1.0.
-    return (n_us_who_read_as_current ) * 1.0 / (rs);
-  }
 
 private:
-  vector<int> pages_stat;
-  int count_users;
+    vector<int> user_page_counts_;  // вектор [user_id] = page_counts
+    vector<int> sorted_users_;   // отсортированы по убыванию количества страниц
+    vector<int> user_positions_; // позиции в векторе sorted_users_
 
-  vector<int> user_page_counts_;  // вектор [user_id] = page_counts
-//  vector<int> sorted_users_;   // отсортированы по убыванию количества страниц
-//  vector<int> user_positions_; // позиции в векторе sorted_users_
-
-  int GetUserCount() const {
-    return count_users;
-  }
-  void AddUser(int user_id, int page_count) {
-      ++count_users;
-      ++pages_stat[page_count];
-
-
-
-//        sorted_users_.push_back(user_id);
-//    user_positions_[user_id] = sorted_users_.size() - 1;
-
-  }
-
+    int GetUserCount() const {
+        return sorted_users_.size();
+    }
+    void AddUser(int user_id) {
+        sorted_users_.push_back(user_id);
+        user_positions_[user_id] = sorted_users_.size() - 1;
+    }
+    void SwapUsers(int lhs_position, int rhs_position) {
+        const int lhs_id = sorted_users_[lhs_position];
+        const int rhs_id = sorted_users_[rhs_position];
+        swap(sorted_users_[lhs_position], sorted_users_[rhs_position]);
+        swap(user_positions_[lhs_id], user_positions_[rhs_id]);
+    }
+    // Статическое поле не принадлежит какому-то конкретному
+    // объекту класса. По сути это глобальная переменная,
+    // в данном случае константная.
+    // Будь она публичной, к ней можно было бы обратиться снаружи
+    // следующим образом: ReadingManager::MAX_USER_COUNT.
     static const int MAX_USER_COUNT_ = 100'000;
-
 };
 
 
@@ -120,72 +103,3 @@ int main() {
   return 0;
 }
 
-
-/*
- * class ReadingManager {
-public:
-  ReadingManager()
-      : user_page_counts_(MAX_USER_COUNT_ + 1, 0),
-        sorted_users_(),
-        user_positions_(MAX_USER_COUNT_ + 1, -1) {}
-
-  void Read(int user_id, int page_count) {
-    if (user_page_counts_[user_id] == 0) {
-      AddUser(user_id);
-    }
-    user_page_counts_[user_id] = page_count;
-    int& position = user_positions_[user_id];
-    while (position > 0 && page_count > user_page_counts_[sorted_users_[position - 1]]) {
-      SwapUsers(position, position - 1);
-    }
-  }
-
-  double Cheer(int user_id) const {
-    if (user_page_counts_[user_id] == 0) {
-      return 0;
-    }
-    const int user_count = GetUserCount();
-    if (user_count == 1) {
-      return 1;
-    }
-    const int page_count = user_page_counts_[user_id];
-    int position = user_positions_[user_id];
-    while (position < user_count &&
-      user_page_counts_[sorted_users_[position]] == page_count) {
-      ++position;
-    }
-    if (position == user_count) {
-        return 0;
-    }
-    // По умолчанию деление целочисленное, поэтому
-    // нужно привести числитель к типу double.
-    // Простой способ сделать это — умножить его на 1.0.
-    return (user_count - position) * 1.0 / (user_count - 1);
-  }
-
-private:
-  vector<int> user_page_counts_;  // вектор [user_id] = page_counts
-  vector<int> sorted_users_;   // отсортированы по убыванию количества страниц
-  vector<int> user_positions_; // позиции в векторе sorted_users_
-
-  int GetUserCount() const {
-    return sorted_users_.size();
-  }
-  void AddUser(int user_id) {
-    sorted_users_.push_back(user_id);
-    user_positions_[user_id] = sorted_users_.size() - 1;
-  }
-  void SwapUsers(int lhs_position, int rhs_position) {
-    const int lhs_id = sorted_users_[lhs_position];
-    const int rhs_id = sorted_users_[rhs_position];
-    swap(sorted_users_[lhs_position], sorted_users_[rhs_position]);
-    swap(user_positions_[lhs_id], user_positions_[rhs_id]);
-  }
-    // Статическое поле не принадлежит какому-то конкретному
-    // объекту класса. По сути это глобальная переменная,
-    // в данном случае константная.
-    // Будь она публичной, к ней можно было бы обратиться снаружи
-    // следующим образом: ReadingManager::MAX_USER_COUNT.
-    static const int MAX_USER_COUNT_ = 100'000;
-}
- */
