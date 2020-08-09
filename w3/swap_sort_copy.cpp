@@ -19,7 +19,20 @@ void SortPointers(vector<T*>& pointers) {
 
 
 template <typename T>
-void ReversedCopy(T* source, size_t count, T* destination);
+void ReversedCopy(T* source, size_t count, T* destination) {
+    auto src_begin = source;
+    auto src_end = source + count;
+    auto dst_begin = destination;
+    auto dst_end = destination + count;
+
+    if (dst_begin >= src_end || dst_end >= src_begin) {
+        reverse_copy(src_begin, src_end, dst_begin);
+    } else if (dst_begin > src_begin) {  // dst справа
+        for (size_t i = 0; i <= *dst_end; ++i) {
+            *(dst_begin + i) = *(src_end - i - 1);
+        }
+    }
+}
 
 void TestSwap() {
   int a = 1;
@@ -54,7 +67,7 @@ void TestSortPointers() {
   ASSERT_EQUAL(*pointers[2], 3);
 }
 
-/*
+
 void TestReverseCopy() {
   const size_t count = 7;
 
@@ -77,11 +90,11 @@ void TestReverseCopy() {
   delete[] source;
 }
 
- */
+
 int main() {
   TestRunner tr;
   RUN_TEST(tr, TestSwap);
   RUN_TEST(tr, TestSortPointers);
-//  RUN_TEST(tr, TestReverseCopy);
+  RUN_TEST(tr, TestReverseCopy);
   return 0;
 }
