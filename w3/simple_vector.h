@@ -1,7 +1,8 @@
 #pragma once
 
 #include <cstdlib>
-//#include <iterator>
+#include <iterator>
+#include <algorithm>
 
 template <typename T>
 class SimpleVector {
@@ -10,6 +11,7 @@ public:
       data = nullptr;
       _end = nullptr;
       _cap = 0;
+      _size = 0;
   }
 
   explicit SimpleVector(size_t size) {
@@ -17,6 +19,7 @@ public:
     _end = data + size;
       _cap = size;
   }
+
   ~SimpleVector() {
       delete [] data;
   }
@@ -42,15 +45,35 @@ public:
   }
 
   void PushBack(const T& value) {
-      if (_cap == 0) {
-          data = new T[1];
-          _end = data + 1;
-          ++_size;
+      if (_cap == 0 && _size == 0) {
+          T* new_data = new T[1];
+          T* new_end = new_data + 1;
           ++_cap;
-          data[_size - 1] = value;
+
+          new_data[_size] = value;
+          ++_size;
+          data = new_data;
+          _end = new_end;
+
+      } else if (_size < _cap) {
+        data[_size] =  value;
       }
 
+      else if (_size == _cap) {
+          T* new_data = new T[_cap * 2];
+          T* new_end = new_data + (_cap * 2);
+          _cap = _cap * 2;
 
+          for (size_t i = 0; data + i < _end; ++i) {
+              *(new_data + i) = *(data);
+          }
+
+          data = new_data;
+          _end = new_end;
+          *(data + _size) = value;
+          ++_size;
+//          copy(data, _end, new_data);
+      }
   }
 
 private:
