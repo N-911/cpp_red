@@ -8,93 +8,109 @@ using namespace std;
 
 class Editor {
 public:
-    // Реализуйте конструктор по умолчанию и объявленные методы
     Editor() {
-//        position_cursor = 0;
-//        buffer = "";
-//        text_string = "";
+        position_cursor = text_string.end();
     }
 
     void Left() {  // сдвинуть курсор влево
-        move_iterator_backward(1);
-//        if (position_cursor != text_string.begin()) {
-//            --position_cursor;
-//        }
+        position_cursor = move_iterator(position_cursor, -1);
     }
 
     void Right() {  // сдвинуть курсор вправо
-        move_iterator_forward(1);
-//        if (position_cursor != text_string.end()) {
-//            ++position_cursor;
-//        }
+        position_cursor = move_iterator(position_cursor, 1);
+//        move_iterator_forward(1);
     }
 
     void Insert(char token) {  // вставить символ token
         text_string.insert(position_cursor, token);
-        move_iterator_forward(1);
-//        ++position_cursor;
+
+//        position_cursor = move_iterator(position_cursor, 1);
+//        move_iterator_forward(buffer.size());
     }
 
     void Cut(size_t tokens = 1) {  // вырезать не более tokens символов, начиная с текущей позиции курсора
+        auto pos2 = move_iterator(position_cursor, tokens);
+        buffer.assign(position_cursor, pos2);
+        position_cursor = text_string.erase(position_cursor, pos2);
+
+        /*
         if (tokens) {
             Copy(tokens);
-//            text_string.erase(text_string.begin() + position_cursor, text_string.begin() + position_cursor + tokens);
-//            text_string.erase (position_cursor, min(position_cursor + tokens, text_string.size()));
-            text_string.erase(position_cursor, text_string.end());
-            move_iterator_backward(tokens);
+            auto it_end = position_cursor;
+            for (auto i = 0; i < buffer.size(); ++i) {
+                if (it_end != text_string.end()) {
+                    ++it_end;
+                }
+            }
+
+            auto it_start =  move_iterator(position_cursor, buffer.size());
+//            move_iterator_forward(buffer.size());
+            text_string.erase(it_start, it_end);
+        } else {
+            buffer.clear();
         }
+*/
 
     }
 
     void Copy(size_t tokens = 1) {// cкопироват не более tokens символов начиная с текущей позиции курсора
-
-//        auto it = position_cursor + tokens;
-
-        buffer.assign(pos, it);
-
-//        if (tokens) {
-//            buffer.clear();
-//            buffer = text_string.substr(position_cursor, min (tokens, (text_string.size() - position_cursor)));
-//        }
+        buffer.clear();
+        if (tokens) {
+            auto it = move_iterator(position_cursor, tokens);
+            buffer.assign(position_cursor, it);
+        }
     }
 
     void Paste() {  // вставить содержимое буфера в текущую позицию курсора
-//        text_string.insert(position_cursor, buffer);
-//        position_cursor += buffer.size();
-        move_iterator_forward(buffer.size());
+//        if (buffer.size()) {
+        text_string.insert(position_cursor, buffer.begin(), buffer.end());
+//            move_iterator_forward(buffer.size());
+//        }
     }
 
     string GetText() const { // получить текущее содержимое текстового редактора
-//        auto res = string_view(text_string);
-        return text_string;
+        return {text_string.begin(), text_string.end()};
 
     }
 
 private:
-    void move_iterator_forward(size_t step) {
-        for (size_t i = 0; i < step; ++i) {
-            if (position_cursor != text_string.end()) {
-                ++position_cursor;
-            } else {
-                break;
+    using Iterator = list<char>::iterator;
+/*
+    Iterator move_iterator(Iterator it, size_t step)  const {
+        if (step > 0) {
+            for (size_t i = 0; i < step; ++i) {
+                if (it != text_string.end()) {
+                    ++it;
+                }
             }
         }
+        if (step < 0) {
+            for (size_t i = step; i > 0; --i) {
+                if (it != text_string.begin()) {
+                    ++it;
+                }
+            }
+        }
+    }
+*/
+    Iterator move_iterator(Iterator it, int steps) const {
+        while (steps > 0 && it != text_string.end()) {
+            ++it;
+            --steps;
+        }
+        while (steps < 0 && it != text_string.begin()) {
+            --it;
+            ++steps;
+        }
+        return it;
     }
 
-    void move_iterator_backward(size_t step) {
-        for (size_t i = 0; i < step; ++i) {
-            if (position_cursor != text_string.begin()) {
-                --position_cursor;
-            } else {
-                break;
-            }
-        }
-    }
+
 
     list<char> text_string;
     list<char> buffer;
-    list<char>::iterator position_cursor = text_string.end();
-}
+    list<char>::iterator position_cursor;
+};
 
 
 void TypeText(Editor& editor, const string& text) {
