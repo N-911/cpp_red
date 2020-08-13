@@ -16,19 +16,22 @@ public:
     }
 
     void Left() {  // сдвинуть курсор влево
-        if (position_cursor != text_string.begin()) {
-            --position_cursor;
-        }
+        move_iterator_backward(1);
+//        if (position_cursor != text_string.begin()) {
+//            --position_cursor;
+//        }
     }
 
     void Right() {  // сдвинуть курсор вправо
-        if (position_cursor != text_string.end()) {
-            ++position_cursor;
-        }
+        move_iterator_forward(1);
+//        if (position_cursor != text_string.end()) {
+//            ++position_cursor;
+//        }
     }
 
     void Insert(char token) {  // вставить символ token
         text_string.insert(position_cursor, token);
+        move_iterator_forward(1);
 //        ++position_cursor;
     }
 
@@ -38,12 +41,14 @@ public:
 //            text_string.erase(text_string.begin() + position_cursor, text_string.begin() + position_cursor + tokens);
 //            text_string.erase (position_cursor, min(position_cursor + tokens, text_string.size()));
             text_string.erase(position_cursor, text_string.end());
+            move_iterator_backward(tokens);
         }
 
     }
+
     void Copy(size_t tokens = 1) {// cкопироват не более tokens символов начиная с текущей позиции курсора
 
-        auto it = position_cursor + tokens;
+//        auto it = position_cursor + tokens;
 
         buffer.assign(pos, it);
 
@@ -52,22 +57,44 @@ public:
 //            buffer = text_string.substr(position_cursor, min (tokens, (text_string.size() - position_cursor)));
 //        }
     }
+
     void Paste() {  // вставить содержимое буфера в текущую позицию курсора
-        text_string.insert(position_cursor, buffer);
-        position_cursor += buffer.size();
+//        text_string.insert(position_cursor, buffer);
+//        position_cursor += buffer.size();
+        move_iterator_forward(buffer.size());
     }
+
     string GetText() const { // получить текущее содержимое текстового редактора
 //        auto res = string_view(text_string);
-    return text_string;
+        return text_string;
 
     }
 
 private:
+    void move_iterator_forward(size_t step) {
+        for (size_t i = 0; i < step; ++i) {
+            if (position_cursor != text_string.end()) {
+                ++position_cursor;
+            } else {
+                break;
+            }
+        }
+    }
+
+    void move_iterator_backward(size_t step) {
+        for (size_t i = 0; i < step; ++i) {
+            if (position_cursor != text_string.begin()) {
+                --position_cursor;
+            } else {
+                break;
+            }
+        }
+    }
+
     list<char> text_string;
     list<char> buffer;
-    list<char> :: iterator position_cursor = text_string.end();
-//    size_t position_cursor;
-};
+    list<char>::iterator position_cursor = text_string.end();
+}
 
 
 void TypeText(Editor& editor, const string& text) {
