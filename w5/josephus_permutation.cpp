@@ -9,9 +9,11 @@
 
 using namespace std;
 
-template <typename RandomIt>
-auto move_iterator(RandomIt it) {
-
+template <typename RandomIt, typename Container>
+auto Move_iterator(Container &container, RandomIt it, size_t step) {
+    for (size_t i = 1; i < step; i++) {
+        it = (next(it) == container.end()) ? container.begin() : next(it);
+    }
     return it;
 }
 
@@ -19,21 +21,25 @@ template <typename RandomIt>
 void MakeJosephusPermutation(RandomIt first, RandomIt last, uint32_t step_size) {
 //  vector<typename RandomIt::value_type> pool(first, last);
     list<typename RandomIt::value_type> pool;
-    for (auto it = first; it != last; ++it) {
-        pool.push_back(move(*it));
-    }
-//    move(first, last, back_inserter(pool));
+    move(first, last, back_inserter(pool));
 
-  auto cur_pos = pool.begin();
-//    using list<typename RandomIt::value_type>::iterator Iter = pooll.begin();
+    auto cur_pos = pool.begin();
+    auto next_cur_pos = pool.begin();
   while (!pool.empty()) {
     *(first++) = move(*cur_pos);
 
-    pool.erase(cur_pos);
-    if (pool.empty()) {
+
+    if (pool.size() == 1) {
       break;
     }
-    cur_pos = (cur_pos + step_size - 1) % pool.size();
+    if (next(cur_pos) == pool.end()) {
+        next_cur_pos = pool.begin();
+    } else {
+        next_cur_pos = next(cur_pos);
+    }
+    pool.erase(cur_pos);
+    cur_pos = next_cur_pos;
+    cur_pos = Move_iterator(pool, cur_pos, step_size);
   }
 
 }
