@@ -7,7 +7,7 @@ include_directories(.)
 
 add_executable(w1
 #        logger.cpp
-        #        max_element_if.cpp
+                max_element_if.cpp
         #        sort_by.cpp
                 test_runner.h
 #        airline_ticket.h
@@ -17,5 +17,5 @@ add_executable(w1
 #        table.cpp
 #        deque.cpp
 #        ___templates.cpp
-        paginator.cpp
+#        paginator.cpp
         )

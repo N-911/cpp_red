@@ -21,8 +21,8 @@ public:
 private:
     map<string_view, int> methods_status;
     map<string_view, int> uri_status;
-    array<string, 5> s_met {"GET", "POST", "PUT", "DELETE", "UNKNOWN"};
-    array<string, 6> s_uri {"/", "/order", "/product", "/basket", "/help", "unknown"};
+    inline static const array<string, 5> s_met {"GET", "POST", "PUT", "DELETE", "UNKNOWN"};
+    inline static const array<string, 6> s_uri {"/", "/order", "/product", "/basket", "/help", "unknown"};
 };
 
 HttpRequest ParseRequest(string_view line);
