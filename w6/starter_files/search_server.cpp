@@ -26,8 +26,7 @@ void SearchServer::UpdateDocumentBase(istream& document_input) {
 }
 
 void SearchServer::AddQueriesStream(
-  istream& query_input, ostream& search_results_output
-) {
+  istream& query_input, ostream& search_results_output) {
   for (string current_query; getline(query_input, current_query); ) {
     const auto words = SplitIntoWords(current_query);
 
