@@ -1,7 +1,8 @@
 #include "search_server.h"
 #include "parse.h"
 #include "test_runner.h"
-//#include "profile_extendet.h"
+#include "profile_extendet.h"
+#include "profile.h"
 
 #include <algorithm>
 #include <iterator>
@@ -17,41 +18,6 @@
 using namespace std;
 using namespace chrono;
 
-struct TotalDuration {
-    string message;
-    steady_clock::duration value;
-    explicit TotalDuration(const string& msg = "") : message(msg + ": ")
-            , value(0)
-    { }
-    ~TotalDuration() { ostringstream os; os << message
-                                            << duration_cast<milliseconds>(value).count()
-                                            << " ms" << endl; cerr << os.str();
-    }
-};
-
-
-class AddDuration {
-public:
-    explicit AddDuration(steady_clock::duration& dest)
-            : add_to(dest)
-            , start(steady_clock::now())
-    { }
-
-    explicit AddDuration(TotalDuration& dest) : AddDuration(dest.value)
-    { }
-
-    ~AddDuration() {
-        add_to += steady_clock::now() - start;
-    }
-private:
-    steady_clock::duration& add_to;
-    steady_clock::time_point start;
-};
-
-#define ADD_DURATION(value) \
-  AddDuration UNIQ_ID(__LINE__){value};
-
-
 void TestFunctionality(
   const vector<string>& docs,
   const vector<string>& queries,
@@ -61,6 +27,8 @@ void TestFunctionality(
   istringstream queries_input(Join('\n', queries));
 
   SearchServer srv;
+
+
   srv.UpdateDocumentBase(docs_input);
   ostringstream queries_output;
   srv.AddQueriesStream(queries_input, queries_output);
@@ -77,23 +45,18 @@ void TestFunctionality_log(
         const vector<string>& docs,
         const vector<string>& queries,
         const vector<string>& expected,
-        TotalDuration& dest
+        TotalDuration& dest    // total duration
 ) {
     istringstream docs_input(Join('\n', docs));
     istringstream queries_input(Join('\n', queries));
 
-//    TotalDuration parse("Total parse");
 
     SearchServer srv;
     {
-        ADD_DURATION(dest);
         srv.UpdateDocumentBase(docs_input);
     }
     ostringstream queries_output;
-//    {
-//        ADD_DURATION(AddQueriesStream);
         srv.AddQueriesStream(queries_input, queries_output);
-//    }
 
     const string result = queries_output.str();
     const auto lines = SplitBy(Strip(result), '\n');
@@ -271,7 +234,7 @@ void TestBasicSearch() {
 }
 
 void TestTop_custom() {
-    const vector<string> docs = {
+    vector<string> docs = {
             "milk a",
             "milk b milk",
             "milk c milk milk",
@@ -284,7 +247,15 @@ void TestTop_custom() {
             "fire and earth"
     };
 
-    const vector<string> queries = {"milk", "water", "rock"};
+    for (int i = 0; i <  50'000 - 5; ++i) {
+        docs.push_back("sugar and dd ds sl pdpddp   yeetvs sgv ssaa oolsl dshh shhsh sttw lspddk sdnsvsidv sdkncsn dshbsgdcdsg snnss askaks jasclcn \
+                       dddckdkcn");
+    }
+    vector<string> queries = {"milk", "water", "rock"};
+
+    for (int i = 0; i < 100'000; ++i) {
+        queries.push_back("qwokd");
+    }
     const vector<string> expected = {
             Join(' ', vector{
                     "milk:",
@@ -300,11 +271,33 @@ void TestTop_custom() {
                     "{docid: 8, hitcount: 1}",
             }),
             "rock:",
+            "qwokd:",
     };
 
     TotalDuration test_c("Total test_custom");
     TestFunctionality_log(docs, queries, expected, test_c);
 }
+
+
+//void TestSearchServer(vector<pair<istream, ostream*>> streams) {
+//    // IteratorRange — шаблон из задачи Paginator
+//    // random_time() — функция, которая возвращает случайный
+//    // промежуток времени
+//
+//    LOG_DURATION("Total");
+//    SearchServer srv(streams.front().first);
+//    for (auto& [input, output] :
+//            IteratorRange(begin(streams) + 1, end(streams))) {
+////        this_thread::sleep_for(random_time());
+//        this_thread::sleep_for(2000);
+//        if (!output) {
+//            srv.UpdateDocumentBase(input);
+//        } else {
+//            srv.AddQueriesStream(input, *output);
+//        }
+//    }
+//}
+
 
 int main() {
   TestRunner tr;
@@ -313,5 +306,5 @@ int main() {
   RUN_TEST(tr, TestHitcount);
   RUN_TEST(tr, TestRanking);
   RUN_TEST(tr, TestBasicSearch);
-  RUN_TEST(tr, TestTop_custom);
+//  RUN_TEST(tr, TestTop_custom);
 }

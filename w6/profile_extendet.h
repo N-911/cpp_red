@@ -9,6 +9,12 @@
 using namespace std;
 using namespace chrono;
 
+#define UNIQ_ID_IMPL(lineno) _a_local_var_##lineno
+#define UNIQ_ID(lineno) UNIQ_ID_IMPL(lineno)
+
+#define ADD_DURATION(value) \
+  AddDuration UNIQ_ID(__LINE__) {value};
+
 struct TotalDuration {
     string message;
     steady_clock::duration value;
@@ -38,7 +44,7 @@ private:
     steady_clock::time_point start;
 };
 
-#define ADD_DURATION(value) \
-  AddDuration UNIQ_ID(__LINE__){value};
-
-
+//#define ADD_DURATION(value) \
+//  AddDuration UNIQ_ID(__LINE__){value};
+//
+//

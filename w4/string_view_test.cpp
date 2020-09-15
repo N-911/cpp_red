@@ -7,7 +7,10 @@ using namespace std;
 string ConcatenateStringViews(
         string_view lhs, string_view rhs) {
 
-    return string(lhs) += rhs;
+    string s;
+    s.reserve(lhs.size() + rhs.size());
+    return (s += lhs) += rhs;
+//    return s += lhs += rhs;
 }
 
 int main() {

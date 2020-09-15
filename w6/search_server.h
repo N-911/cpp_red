@@ -1,5 +1,7 @@
 #pragma once
 
+#include "profile_extendet.h"
+
 #include <istream>
 #include <ostream>
 #include <set>
@@ -7,6 +9,8 @@
 #include <vector>
 #include <map>
 #include <string>
+#include <unordered_map>
+
 using namespace std;
 
 class InvertedIndex {
@@ -19,8 +23,10 @@ public:
   }
 
 private:
-  map<string, list<size_t>> index;
+  unordered_map<string, list<size_t>> index;
+//  vector<list<size_t>> index;
   vector<string> docs;
+
 };
 
 class SearchServer {
